@@ -457,6 +457,15 @@ func run(r io.Reader, w io.Writer, opt *option) error {
 		cs = reviewdog.NewSARIFCommentWriter(w, toolName(opt))
 	}
 
+	// override diff service
+	if opt.reporter != "local" && opt.diffCmd != "" {
+		if d, err := diffService(opt.diffCmd, opt.diffStrip); err == nil {
+			ds = d
+		} else {
+			return err
+		}
+	}
+
 	if isProject {
 		return project.Run(ctx, projectConf, buildRunnersMap(opt.runners), cs, ds, opt.tee, opt.filterMode, failLevel(opt))
 	}
